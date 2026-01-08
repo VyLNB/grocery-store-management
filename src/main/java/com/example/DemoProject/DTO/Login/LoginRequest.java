@@ -1,4 +1,4 @@
-package com.example.DemoProject.DTO;
+package com.example.DemoProject.DTO.Login;
 
 import lombok.Data;
 
@@ -6,4 +6,5 @@ import lombok.Data;
 public class LoginRequest {
     private String username;
     private String password;    
+    private String email;
 }
