@@ -1,4 +1,4 @@
-package com.example.DemoProject.DTO;
+package com.example.DemoProject.DTO.Register;
 
 import lombok.Data;
 

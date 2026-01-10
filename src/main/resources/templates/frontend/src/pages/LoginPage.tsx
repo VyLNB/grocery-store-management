@@ -1,10 +1,10 @@
-
 import { Card, Form, Button, InputGroup } from 'react-bootstrap';
 import { PersonFill, LockFill, ArrowRight, BoxSeam } from 'react-bootstrap-icons';
 import './LoginPage.css';
 import { useState } from 'react';
 import { signin } from '../api/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -14,21 +14,21 @@ const Login = () => {
 
     const navigate = useNavigate();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
 
-    try {
-      const response = await signin({ username, password });
-      console.log("Login response:", response);
-    //   navigate('/teacher/dashboard'); 
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
-    } finally {
-      setLoading(false);
-    }
-  };
+        try {
+            const response = await signin({ username, password });
+            console.log("Login response:", response);
+            navigate('/dashboard');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="login-container">
@@ -112,10 +112,16 @@ const Login = () => {
 
                     {/* Card Footer */}
                     <div className="text-center mt-2">
-                        <span className="text-muted small">Chưa có tài khoản? </span>
-                        <a href="#" className="text-custom-purple text-decoration-none small fw-bold">
-                            Liên hệ quản trị viên
-                        </a>
+                        <span className="text-muted small">
+                            Chưa có tài khoản?{" "}
+                            <Link
+                                to="/register"
+                                className="fw-semibold text-decoration-none"
+                                style={{ color: "#a855f7", fontWeight: 600 }}
+                            >
+                                Đăng ký ngay
+                            </Link>
+                        </span>
                     </div>
                 </Card>
             </div>

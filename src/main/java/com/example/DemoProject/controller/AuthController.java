@@ -1,16 +1,13 @@
 package com.example.DemoProject.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.example.DemoProject.DTO.ApiResponse; // Nhớ import ApiResponse
-import com.example.DemoProject.DTO.RegisterRequest;
+import com.example.DemoProject.DTO.ApiResponse; 
 import com.example.DemoProject.DTO.Login.LoginRequest;
 import com.example.DemoProject.DTO.Login.LoginResponse;
+import com.example.DemoProject.DTO.Register.RegisterRequest;
+import com.example.DemoProject.DTO.Register.RegisterResponse;
 import com.example.DemoProject.service.UserService;
 import com.example.DemoProject.model.User;
 import com.example.DemoProject.repository.UserRepository;
@@ -21,7 +18,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    
+
     private final UserService userService;
     private final UserRepository userRepository;
 
@@ -31,16 +28,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<?>> register(@RequestBody @Validated RegisterRequest registerRequest ){
-        userService.register(registerRequest);
-        return ResponseEntity.ok(ApiResponse.success(null, "Đăng ký thành công"));
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(
+            @RequestBody RegisterRequest request) {
+        RegisterResponse newUser = userService.register(request);
+
+        return ResponseEntity.ok(ApiResponse.success(newUser, "Register successful"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @RequestBody LoginRequest request,
-            HttpServletResponse response
-    ) {
+            HttpServletResponse response) {
         LoginResponse loginResponse = userService.login(request);
 
         User user = userRepository.findByUsername(request.getUsername())
@@ -52,8 +50,8 @@ public class AuthController {
         // 4. Tạo Cookie
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false); 
-        cookie.setPath("/"); 
+        cookie.setSecure(false);
+        cookie.setPath("/");
         cookie.setMaxAge(7 * 24 * 60 * 60);
 
         response.addCookie(cookie);

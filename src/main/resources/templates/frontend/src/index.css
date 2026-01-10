@@ -1,0 +1,11 @@
+/* Thêm vào file css toàn cục */
+.bg-purple-subtle {
+    background-color: #f3f0ff !important;
+}
+.text-purple {
+    color: #8b5cf6 !important;
+}
+.last-no-border:last-child {
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
+}
