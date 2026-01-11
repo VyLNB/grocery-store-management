@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 
+import com.example.DemoProject.DTO.ApiResponse;
 import com.example.DemoProject.DTO.Login.*;
 import com.example.DemoProject.DTO.Register.*;
 import com.example.DemoProject.model.User;
@@ -16,9 +17,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    public RegisterResponse register(RegisterRequest registerRequest) {
+    public ApiResponse<RegisterResponse> register(RegisterRequest registerRequest) {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
-            throw new RuntimeException("Email existed");
+            return ApiResponse.error("Email existed");
         }
 
         User user = new User();
@@ -26,11 +27,9 @@ public class UserService {
         user.setEmail(registerRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         User newUser = userRepository.save(user);
-        return new RegisterResponse(
-            newUser.getId(), 
-            newUser.getUsername(), 
-            newUser.getEmail()
-        );
+        
+        RegisterResponse response = new RegisterResponse(newUser.getId(), newUser.getUsername(), newUser.getEmail());
+        return ApiResponse.success(response, "Đăng ký thành công");
     }
 
     // ... imports

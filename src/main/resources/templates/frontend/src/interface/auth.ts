@@ -1,5 +1,4 @@
-// User roles
-export type UserRole = 'student' | 'teacher' | 'admin';
+
 
 // Auth User - Khớp với response từ backend
 export interface AuthUser {

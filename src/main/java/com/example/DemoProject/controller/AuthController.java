@@ -30,9 +30,9 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterResponse>> register(
             @RequestBody RegisterRequest request) {
-        RegisterResponse newUser = userService.register(request);
+        ApiResponse<RegisterResponse> response = userService.register(request);
 
-        return ResponseEntity.ok(ApiResponse.success(newUser, "Register successful"));
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")

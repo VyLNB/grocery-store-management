@@ -1,18 +1,19 @@
 package com.example.DemoProject.controller;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
 
 import com.example.DemoProject.service.ProductService;
+import com.example.DemoProject.DTO.ApiResponse;
 import com.example.DemoProject.model.Product;
-import org.springframework.stereotype.Controller;
+
+import java.util.List;
+
 import org.springframework.ui.Model;
 
-@Controller
+@RestController
 @RequestMapping("/products")
+@CrossOrigin(origins = "*")
 public class ProductController {
     private final ProductService productService;
 
@@ -22,16 +23,21 @@ public class ProductController {
 
     //GetMapping: annotation định tuyến route cho phương thức GET
     @GetMapping // Khi vào /products sẽ hiển thị tất cả sản phẩm
-    public String getAllProducts(Model model){ 
-        model.addAttribute("products", productService.getAll());
-        return "productList";
+    public ApiResponse<List<Product>> getAllProducts(Model model){ 
+        List<Product> products = productService.getAll();
+        return ApiResponse.success(products, "Get products successfully");
     }
 
     @GetMapping("/addProduct") // Khi vào /products/addProduct sẽ thêm sản phẩm mẫu
-    public String addProduct (Model model){
-        model.addAttribute("product", new Product());
-        return "productForm"; // trả về trang product-form.html
+    // public String addProduct (Model model){
+    //     model.addAttribute("product", new Product());
+    //     return "productForm"; // trả về trang product-form.html
+    // }
+    public ApiResponse<Product> addProduct(@RequestBody Product product){
+        Product newProduct = productService.saveProduct(product);
+        return ApiResponse.success(newProduct, "Create product successfully");
     }
+
 
     @PostMapping("/saveProduct") // Xử lý lưu sản phẩm từ form
     public String saveProduct(@ModelAttribute Product product){

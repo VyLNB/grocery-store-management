@@ -6,15 +6,7 @@ const Header = () => {
     <div className="bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between sticky-top">
       {/* Search Bar */}
       <div style={{ maxWidth: '400px', width: '100%' }}>
-        <InputGroup>
-          <InputGroup.Text className="bg-light border-0">
-            <Search size={18} className="text-muted" />
-          </InputGroup.Text>
-          <Form.Control
-            placeholder="Tìm kiếm sản phẩm, đơn hàng..."
-            className="bg-light border-0 shadow-none"
-          />
-        </InputGroup>
+        
       </div>
 
       {/* Right Icons */}

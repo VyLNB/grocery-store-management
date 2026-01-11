@@ -1,21 +1,58 @@
 import HeaderRegister from "../components/HeaderRegister.jsx";
+import { signup } from "../api/auth.js";
 import { useState } from 'react';
-import { Container, Row, Col, Form, Button, Card, InputGroup } from 'react-bootstrap';
-import { FaUser, FaStore, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Container, Row, Col, Form, Button, Card, InputGroup, Alert } from 'react-bootstrap';
+import { FaStore, FaEnvelope, FaLock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 
 const RegisterPage = () => {
+    // 1. Khai báo state cho các trường input
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
     const [showPassword, setShowPassword] = useState(false);
     const brandColor = '#A855F7';
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+const handleRegister = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+
+        try {
+            const response = await signup({
+                username, // Gửi username
+                email,
+                password
+            });
+
+            console.log("Register successful:", response);
+            
+            navigate('/');
+
+        } catch (err: any) {
+            console.error("Register Error:", err);
+            if (err?.issues) {
+                setError(err.issues[0]?.message);
+            } else if (err?.message) {
+                 setError(err.message);
+            } else {
+                setError('Đăng ký thất bại.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
         <div className="d-flex flex-column" style={{ backgroundColor: '#F3F4F6', height: '100vh', overflow: 'hidden' }}>
-            {/* Header giữ nguyên nhưng không chiếm quá nhiều chỗ */}
             <div style={{ flex: '0 0 auto' }}>
                 <HeaderRegister />
             </div>
 
-            {/* Phần thân trang sẽ tự căn giữa theo chiều dọc */}
             <div className="flex-grow-1 d-flex align-items-center justify-content-center">
                 <Container>
                     <Card className="border-0 shadow-lg overflow-hidden mx-auto" style={{ borderRadius: '20px', maxWidth: '1100px' }}>
@@ -27,23 +64,32 @@ const RegisterPage = () => {
                                     <p className="text-muted small mb-0">Quản lý cửa hàng dễ dàng hơn ngay hôm nay.</p>
                                 </div>
 
-                                <Form>
+                                {/* Hiển thị thông báo lỗi nếu có */}
+                                {error && (
+                                    <Alert variant="danger" className="py-2 small text-center">
+                                        {error}
+                                    </Alert>
+                                )}
+
+                                <Form onSubmit={handleRegister}>
                                     <Form.Group className="mb-2">
-                                        <Form.Group className="mb-2">
-                                            <Form.Label className="fw-bold text-secondary" style={{ fontSize: '12px' }}>Tên đăng nhập</Form.Label>
-                                            <InputGroup size="sm">
-                                                <InputGroup.Text className="bg-light border-end-0 text-secondary">
-                                                    <FaStore />
-                                                </InputGroup.Text>
-                                                <Form.Control
-                                                    type="text"
-                                                    placeholder="taphoa_123"
-                                                    className="bg-light border-start-0 shadow-none py-2"
-                                                />
-                                            </InputGroup>
-                                        </Form.Group>
+                                        <Form.Label className="fw-bold text-secondary" style={{ fontSize: '12px' }}>Tên đăng nhập (Tên cửa hàng/Chủ shop)</Form.Label>
+                                        <InputGroup size="sm">
+                                            <InputGroup.Text className="bg-light border-end-0 text-secondary">
+                                                <FaStore />
+                                            </InputGroup.Text>
+                                            <Form.Control
+                                                type="text"
+                                                placeholder="Ví dụ: Tạp hóa Cô Ba"
+                                                className="bg-light border-start-0 shadow-none py-2"
+                                                value={username}
+                                                onChange={(e) => setUsername(e.target.value)}
+                                                required
+                                                minLength={2}
+                                            />
+                                        </InputGroup>
                                     </Form.Group>
-                                    
+
                                     <Form.Group className="mb-2">
                                         <Form.Label className="fw-bold text-secondary" style={{ fontSize: '12px' }}>Email</Form.Label>
                                         <InputGroup size="sm">
@@ -54,6 +100,9 @@ const RegisterPage = () => {
                                                 type="email"
                                                 placeholder="name@example.com"
                                                 className="bg-light border-start-0 shadow-none py-2"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                required
                                             />
                                         </InputGroup>
                                     </Form.Group>
@@ -66,8 +115,12 @@ const RegisterPage = () => {
                                             </InputGroup.Text>
                                             <Form.Control
                                                 type={showPassword ? "text" : "password"}
-                                                placeholder="********"
+                                                placeholder="Ít nhất 6 ký tự"
                                                 className="bg-light border-start-0 border-end-0 shadow-none py-2"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                required
+                                                minLength={6}
                                             />
                                             <InputGroup.Text
                                                 className="bg-light border-start-0 text-secondary"
@@ -80,10 +133,12 @@ const RegisterPage = () => {
                                     </Form.Group>
 
                                     <Button
+                                        type="submit"
                                         className="w-100 fw-bold py-2 border-0 mt-2"
                                         style={{ backgroundColor: brandColor }}
+                                        disabled={loading}
                                     >
-                                        Đăng ký ngay
+                                        {loading ? 'Đang xử lý...' : 'Đăng ký ngay'}
                                     </Button>
 
                                     <div className="text-center mt-3 small">
@@ -95,7 +150,7 @@ const RegisterPage = () => {
                                 </Form>
                             </Col>
 
-                            {/* === CỘT PHẢI: PROMO / BANNER === */}
+                            {/* === CỘT PHẢI: PROMO / BANNER (Giữ nguyên) === */}
                             <Col lg={6} className="d-none d-lg-block position-relative">
                                 <div
                                     className="h-100 w-100 p-4 d-flex flex-column justify-content-center text-white"
@@ -108,7 +163,6 @@ const RegisterPage = () => {
                                         <span className="badge bg-white text-primary mb-2 px-3 py-1 rounded-pill shadow-sm small" style={{ color: brandColor + '!important' }}>
                                             ✨ Quản lý thông minh
                                         </span>
-                                        {/* Giảm kích thước font chữ tiêu đề */}
                                         <h2 className="fw-bold mb-2 text-dark">
                                             Kiểm soát hàng tồn kho,<br /> doanh thu mọi lúc.
                                         </h2>
@@ -116,7 +170,6 @@ const RegisterPage = () => {
                                             Tham gia cùng hơn 10.000 chủ cửa hàng tạp hóa đang sử dụng nền tảng của chúng tôi.
                                         </p>
 
-                                        {/* Thu nhỏ Mockup UI */}
                                         <div className="bg-white p-2 rounded-4 shadow-lg opacity-75 mx-auto" style={{ maxWidth: '80%' }}>
                                             <div className="d-flex gap-2 mb-2">
                                                 <div className="bg-secondary bg-opacity-10 rounded p-2 flex-grow-1"></div>

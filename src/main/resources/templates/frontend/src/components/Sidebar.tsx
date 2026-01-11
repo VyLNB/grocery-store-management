@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
                 </div>
             </div>
 
-            <Nav className="flex-column mb-auto gap-1">
+            <Nav className="flex-column mb-auto gap-1 ">
                 {menuItems.map(item => (
                     <NavLink
                         to={item.path}
@@ -41,7 +41,8 @@ const Sidebar: React.FC = () => {
                         style={({ isActive }) => ({
                             backgroundColor: isActive ? '#f3f0ff' : 'transparent',
                             color: isActive ? '#8b5cf6' : '#6c757d',
-                            fontWeight: isActive ? '600' : '400'
+                            fontWeight: isActive ? '600' : '400',
+                            textDecoration: 'none',
                         })}
                     >
                         {item.icon}
