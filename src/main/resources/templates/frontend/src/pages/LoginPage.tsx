@@ -22,7 +22,7 @@ const Login = () => {
         try {
             const response = await signin({ username, password });
             console.log("Login response:", response);
-            navigate('/dashboard');
+            navigate('/admin/dashboard');
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
         } finally {

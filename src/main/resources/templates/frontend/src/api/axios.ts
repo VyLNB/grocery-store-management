@@ -1,5 +1,9 @@
+// axios.ts
 import axios, { AxiosError } from "axios";
+// Import type riêng để tránh lỗi verbatimModuleSyntax
+import type { InternalAxiosRequestConfig } from "axios";
 
+// 1. Giữ nguyên Interface
 export interface ApiResponse<T = unknown> {
     success: boolean;
     data: T;
@@ -12,16 +16,34 @@ const apiClient = axios.create({
     headers: {
         "Content-Type": "application/json",
     },
-    withCredentials: true,
 });
 
+// 2. Giữ nguyên Interceptor (để gắn token nếu có)
+apiClient.interceptors.request.use(
+    (config: InternalAxiosRequestConfig) => {
+        const token = localStorage.getItem("token");
+        if (token && config.headers) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+export function setAuthToken(token: string) {
+  apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+}
+
+// 3. CẬP NHẬT HÀM NÀY
 export async function apiRequest<T>(
   method: "get" | "post" | "put" | "delete",
   url: string,
   payload?: unknown
 ): Promise<T> {
   try {
-    const response = await apiClient.request<ApiResponse<T> | T>({
+    const response = await apiClient.request({
       method,
       url: url,
       data: payload,
@@ -29,17 +51,24 @@ export async function apiRequest<T>(
 
     const responseData = response.data;
     
-    // DEBUG: Log để xem response structure
-    console.log('API Response:', responseData);
+    // DEBUG: Hãy bật dòng này lên để xem chính xác Backend trả về cái gì
+    console.log(`API Response [${url}]:`, responseData);
 
-    // Kiểm tra nếu response có cấu trúc ApiResponse
+    // Kiểm tra nếu response có cấu trúc wrapper { success: ... }
     if (responseData && typeof responseData === 'object' && 'success' in responseData) {
-      const apiResponse = responseData as ApiResponse<T>;
-      console.log('Success:', apiResponse.success);
-      console.log('Data:', apiResponse.data);
+      const apiResponse = responseData as any; // Dùng any để check linh hoạt
       
       if (apiResponse.success) {
-        return apiResponse.data;
+        // CASE 1: Standard Wrapper - Dữ liệu nằm trong field 'data'
+        // VD: { success: true, data: { token: "..." } }
+        if ('data' in apiResponse) {
+            return apiResponse.data as T;
+        }
+
+        // CASE 2: Flat Structure - Dữ liệu nằm ngay tại root (Trường hợp của bạn)
+        // VD: { success: true, token: "...", user: { ... } }
+        // Lúc này, ta trả về chính responseData
+        return responseData as T;
       }
       
       throw new Error(
@@ -47,27 +76,24 @@ export async function apiRequest<T>(
       );
     }
     
-    // Nếu backend trả trực tiếp data (không có wrapper)
-    console.log('Direct data response');
+    // Trường hợp Backend trả về raw data không có wrapper
     return responseData as T;
 
   } catch (err) {
     console.error('API Request Error:', err);
     
-    // Trường hợp khác errors cần can thiệp sâu hơn ở server
     if (axios.isAxiosError(err)) {
-      const serverError = (err as AxiosError<ApiResponse>).response
-        ?.data;
+        // Xử lý lỗi 403/401
+        if (err.response?.status === 401 || err.response?.status === 403) {
+            console.warn("Lỗi xác thực: Token sai hoặc hết hạn.");
+            // Tùy chọn: localStorage.removeItem("token");
+        }
 
-      console.error('Server Error:', serverError);
-
+      const serverError = (err as AxiosError<ApiResponse>).response?.data;
       if (serverError) {
         throw new Error(serverError.message || "Lỗi từ máy chủ");
       }
-
-      throw new Error(
-        err.message || "Lỗi kết nối mạng hoặc máy chủ không phản hồi."
-      );
+      throw new Error(err.message || "Lỗi kết nối mạng.");
     }
     throw err;
   }

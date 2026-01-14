@@ -14,19 +14,62 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getAll(){
+    // Lấy tất cả sản phẩm
+    public List<Product> getAllProducts(){
         return productRepository.findAll();
     }
 
-    public Product getById (Long id){
+    // Lấy sản phẩm theo ID
+    public Product getProductById (Long id){
         return productRepository.findById(id).orElse(null);
     }
 
-    public Product saveProduct (Product product){
+    // Tạo sản phẩm mới
+    public Product createProduct (Product product){
         return productRepository.save(product);
     }
 
-    public void deleteById (Long id){
-        productRepository.deleteById(id);
+    // Xóa sản phẩm theo ID
+    public boolean deleteProductById (Long id){
+        if (productRepository.existsById(id)){
+            productRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
+
+    // Cập nhật sản phẩm 
+    public Product updateProductById(Long id, Product newProduct){
+        Product existingProduct = productRepository.findById(id).orElse(null);
+
+        // không tồn tại sản phẩm
+        if (existingProduct == null){
+            return null;
+        } 
+
+        // cần tối ưu sau
+        if (newProduct.getCategory() != null) {
+            existingProduct.setCategory(newProduct.getCategory());
+        }
+        if (newProduct.getName() != null){
+            existingProduct.setName(newProduct.getName());
+        }
+        if (newProduct.getPrice() != null){
+            existingProduct.setPrice(newProduct.getPrice());
+        }
+        if (newProduct.getQuantity() != null){
+            existingProduct.setQuantity(newProduct.getQuantity());
+        }
+        if (newProduct.getStatus() != null){
+            existingProduct.setStatus(newProduct.getStatus());
+        }
+        if (newProduct.getStock() != null){
+            existingProduct.setStock(newProduct.getStock());
+        }
+        if (newProduct.getUnit() != null){
+            existingProduct.setUnit(newProduct.getUnit());
+        }
+
+        return productRepository.save(existingProduct);
     }
 }

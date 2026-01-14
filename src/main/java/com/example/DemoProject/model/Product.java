@@ -14,7 +14,9 @@ public class Product {
     private Long id;
 
     private String name;
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
     private String unit; // đơn vị tính: kg, cái, gói...
     private Integer quantity;
     private Double price;
