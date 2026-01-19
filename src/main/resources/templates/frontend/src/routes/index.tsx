@@ -5,6 +5,8 @@ import RegisterPage from "../pages/RegisterPage";
 import DashBoard from "../pages/DashBoard";
 import ProductPage from "../pages/Product/ProductPage";
 import AdminLayout from "../layout/AdminLayout";
+import CategoryPage from "../pages/Category";
+import CreateProduct from "../pages/Product/CreateProduct";
 
 const router = createBrowserRouter([
     {
@@ -17,16 +19,34 @@ const router = createBrowserRouter([
     },
     {
         path: "/admin",
-        element: (<AdminLayout/>),
+        element: (<AdminLayout />),
         children: [
             {
                 path: "dashboard",
-                element: <DashBoard/>
+                element: <DashBoard />
             },
             {
                 path: "products",
-                element: <ProductPage/>
-            }
+                children: [
+                    {
+                        index: true,
+                        element: <ProductPage />,
+                    },
+                    {
+                        path: "add",
+                        element: <CreateProduct/>,
+                    }
+                ],
+            },
+            {
+                path: "categories",
+                children: [
+                    {
+                        index: true,
+                        element: <CategoryPage />,
+                    }
+                ],
+            },
         ]
     }
 ]);

@@ -7,13 +7,15 @@ import {
     ShoppingCart,
     BarChart3,
     Warehouse,
-    Settings
+    Settings,
+    LayoutGrid
 } from "lucide-react";
 
 const Sidebar: React.FC = () => {
     const menuItems = [
         { id: "dashboard", title: "Tổng quan", path: "/admin/dashboard", icon: <LayoutDashboard size={18} /> },
         { id: "products", title: "Sản phẩm", path: "/admin/products", icon: <Package size={18} /> },
+        { id: "category", title: "Danh mục", path: "/admin/categories", icon: <LayoutGrid size={18}/>},
         { id: "orders", title: "Đơn hàng", path: "/admin/orders", icon: <ShoppingCart size={18} /> },
         { id: "revenue", title: "Doanh thu", path: "/admin/revenue", icon: <BarChart3 size={18} /> },
         { id: "inventory", title: "Kho hàng", path: "/admin/inventory", icon: <Warehouse size={18} /> },

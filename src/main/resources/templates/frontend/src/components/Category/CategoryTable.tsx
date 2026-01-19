@@ -10,16 +10,13 @@ import {
     ExclamationTriangleFill, // Icon cho lỗi
     ArrowRepeat // Icon nút reload
 } from 'react-bootstrap-icons';
-import type { ProductItem } from '../../interface/productInterface';
-import { getAllProducts } from '../../api/products';
-import { useNavigate } from 'react-router-dom';
+import type { CategoryItem } from '../../interface/productInterface';
+import { getAllCategories } from '../../api/category';
 
-const ProductTable = () => {
-    const [products, setProducts] = useState<ProductItem[]>([]);
+const CategoryTable= () => {
+    const [products, setProducts] = useState<CategoryItem[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
-    const navigate = useNavigate();
 
     const fetchProducts = async () => {
         try {
@@ -27,7 +24,7 @@ const ProductTable = () => {
             setError(null);
 
             // Gọi API
-            const result = await getAllProducts();
+            const result = await getAllCategories();
 
             if (Array.isArray(result)) {
                 setProducts(result);
@@ -99,9 +96,7 @@ const ProductTable = () => {
             {/* --- HEADER --- */}
             <div className="d-flex flex-wrap justify-content-between align-items-center mb-4">
                 <h2 className="fw-bold mb-1">Quản lý Sản phẩm</h2>
-                <button className="btn btn-custom-purple text-white d-flex align-items-center gap-2" onClick={() => {
-                    navigate('/admin/products/add');
-                }}>
+                <button className="btn btn-custom-purple text-white d-flex align-items-center gap-2">
                     <Plus size={20} /> Thêm sản phẩm mới
                 </button>
             </div>
@@ -117,7 +112,6 @@ const ProductTable = () => {
                             <input type="text" className="form-control border-start-0 ps-0" placeholder="Tìm kiếm..." />
                         </div>
                     </div>
-                    {/* ... (Giữ nguyên phần filter dropdown) ... */}
                     <div className="col-md-8 d-flex gap-3 justify-content-md-end flex-wrap">
                         <div className="dropdown">
                             <button className="btn btn-light dropdown-toggle d-flex align-items-center gap-2" type="button"><Filter /> Tất cả Danh mục</button>
@@ -152,10 +146,7 @@ const ProductTable = () => {
                             <table className="table table-hover align-middle mb-0">
                                 <thead className="bg-light text-uppercase text-muted small">
                                     <tr>
-                                        <th className="py-3 ps-4">Sản phẩm</th>
-                                        <th className="py-3">Danh mục</th>
-                                        <th className="py-3">Giá bán</th>
-                                        <th className="py-3">Tồn kho</th>
+                                        <th className="py-3 ps-4">Danh mục sản phẩm</th>
                                         <th className="py-3">Trạng thái</th>
                                         <th className="py-3 text-end pe-4">Thao tác</th>
                                     </tr>
@@ -171,7 +162,6 @@ const ProductTable = () => {
                                         </tr>
                                     ) : (
                                         products.map((item) => {
-                                            const status = getStockStatus(item.stock);
                                             return (
                                                 <tr key={item.id} className="border-bottom">
                                                     <td className="ps-4 py-3">
@@ -186,17 +176,7 @@ const ProductTable = () => {
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td><span className={`badge rounded-pill fw-normal px-3 py-2 ${getCategoryClass(item.category?.name || "")}`}>
-                                                        {item.category?.name || "Chưa phân loại"}
-                                                    </span></td>
-                                                    <td className="fw-bold">{formatPrice(item.price)}</td>
-                                                    <td>{item.stock} <span className="text-muted small">{item.unit}</span></td>
-                                                    <td>
-                                                        <div className={`d-flex align-items-center gap-2 fw-bold ${status.color}`}>
-                                                            <span className="rounded-circle" style={{ width: '8px', height: '8px', backgroundColor: 'currentColor' }}></span>
-                                                            <span className="small">{status.text}</span>
-                                                        </div>
-                                                    </td>
+                                                    
                                                     <td className="text-end pe-4">
                                                         <button className="btn btn-link text-muted p-1 hover-purple"><PencilSquare size={18} /></button>
                                                         <button className="btn btn-link text-muted p-1 hover-danger"><Trash size={18} /></button>
@@ -229,4 +209,4 @@ const ProductTable = () => {
     );
 };
 
-export default ProductTable;
+export default CategoryTable;
