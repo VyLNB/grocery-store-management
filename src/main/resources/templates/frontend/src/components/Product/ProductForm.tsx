@@ -1,23 +1,33 @@
-// ProductForm.tsx
-import React, { useState } from 'react';
+// src/components/Product/ProductForm.tsx
+import React, { useState, useEffect } from 'react';
 import { Form, Button, Card, Row, Col } from 'react-bootstrap';
+// 1. Import Interface chuẩn từ file chung
+import type { CategoryItem } from '../../interface/productInterface';
 
-// ============= TYPES =============
-interface Category {
+// Xóa interface Category cục bộ cũ để tránh xung đột
+/* interface Category {
   id: number;
   name: string;
-}
+  isActive: boolean;
+} 
+*/
 
 export interface ProductFormData {
+  id?: number;
   name: string;
   sku: string;
   categoryId: number | null;
+  price: number;
+  quantity: number;
+  stock: number;
+  unit: string;
   description: string;
+  isActive: boolean;
 }
 
 interface ProductFormProps {
   initialData?: ProductFormData;
-  categories: Category[];
+  categories: CategoryItem[];
   onSubmit: (data: ProductFormData) => void;
   onCancel?: () => void;
   isLoading?: boolean;
@@ -31,17 +41,9 @@ interface FormFieldProps {
   children: React.ReactNode;
 }
 
-// ============= REUSABLE COMPONENTS =============
-
-// Form Field Wrapper - Tái sử dụng cho mọi input
-const FormField: React.FC<FormFieldProps> = ({ 
-  label, 
-  required, 
-  error, 
-  children 
-}) => (
+const FormField: React.FC<FormFieldProps> = ({ label, required, error, children }) => (
   <Form.Group className="mb-3">
-    <Form.Label>
+    <Form.Label className="fw-bold">
       {label} {required && <span className="text-danger">*</span>}
     </Form.Label>
     {children}
@@ -49,42 +51,39 @@ const FormField: React.FC<FormFieldProps> = ({
   </Form.Group>
 );
 
-// Section Header - Tái sử dụng cho các section khác nhau
-const SectionHeader: React.FC<{ icon?: string; title: string }> = ({ 
-  icon = 'ℹ️', 
-  title 
-}) => (
-  <div className="d-flex align-items-center mb-4 pb-3 border-bottom">
-    <span className="me-2 fs-5">{icon}</span>
-    <h5 className="mb-0 fw-semibold">{title}</h5>
-  </div>
-);
-
-// ============= MAIN FORM COMPONENT =============
 const ProductForm: React.FC<ProductFormProps> = ({
-  initialData = {
-    name: '',
-    sku: '',
-    categoryId: null,
-    description: '',
-  },
+  initialData,
   categories,
   onSubmit,
   onCancel,
   isLoading = false,
   mode = 'create',
 }) => {
-  const [formData, setFormData] = useState<ProductFormData>(initialData);
+  // Giá trị mặc định chuẩn cho Product
+  const defaultData: ProductFormData = {
+    name: '',
+    sku: '',
+    categoryId: null,
+    price: 0,
+    quantity: 0,
+    stock: 0,
+    unit: '',
+    description: '',
+    isActive: true,
+  };
+
+  const [formData, setFormData] = useState<ProductFormData>(initialData || defaultData);
   const [errors, setErrors] = useState<Partial<Record<keyof ProductFormData, string>>>({});
 
-  // Handle field changes
-  const handleChange = (
-    field: keyof ProductFormData,
-    value: string | number | null
-  ) => {
+  // Cập nhật state nếu initialData thay đổi (khi edit)
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    }
+  }, [initialData]);
+
+  const handleChange = (field: keyof ProductFormData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    
-    // Clear error when user types
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -94,10 +93,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  // Validation logic
   const validate = (): boolean => {
     const newErrors: Partial<Record<keyof ProductFormData, string>> = {};
-
+    
     if (!formData.name.trim()) {
       newErrors.name = 'Tên sản phẩm là bắt buộc';
     }
@@ -112,11 +110,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
       newErrors.categoryId = 'Vui lòng chọn danh mục';
     }
 
+    if (formData.price <= 0) {
+      newErrors.price = 'Giá sản phẩm phải lớn hơn 0';
+    }
+
+    if (formData.quantity < 0) {
+      newErrors.quantity = 'Số lượng không được âm';
+    }
+
+    if (formData.stock < 0) {
+      newErrors.stock = 'Tồn kho không được âm';
+    }
+
+    if (!formData.unit.trim()) {
+      newErrors.unit = 'Đơn vị tính là bắt buộc';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validate()) {
@@ -124,113 +137,185 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
+  // 3. Lọc danh mục đang hoạt động (isActive === true)
+  const activeCategories = categories.filter(cat => cat.isActive === true);
+
   return (
-    <div className="container py-4" style={{ maxWidth: '800px' }}>
-      {/* Page Header */}
-      <h2 className="mb-2">
+    <div className="container py-4" style={{ maxWidth: '900px' }}>
+      <h2 className="mb-4 fw-bold">
         {mode === 'create' ? 'Thêm sản phẩm mới' : 'Chỉnh sửa sản phẩm'}
       </h2>
-      <p className="text-muted mb-4">
-        Nhập các chi tiết sản phẩm để cập nhật danh mục hàng hóa của bạn.
-      </p>
 
-      {/* Form */}
       <Card className="border-0 shadow-sm">
         <Card.Body className="p-4">
-          <SectionHeader icon="ℹ️" title="Thông tin cơ bản" />
-
           <Form onSubmit={handleSubmit}>
-            {/* Product Name */}
-            <FormField
-              label="Tên sản phẩm"
-              required
-              error={errors.name}
-            >
-              <Form.Control
-                type="text"
-                placeholder="VD: Sữa tươi TH True Milk 1L"
-                value={formData.name}
-                onChange={(e) => handleChange('name', e.target.value)}
-                isInvalid={!!errors.name}
-                disabled={isLoading}
-              />
-            </FormField>
-
-            {/* SKU and Category Row */}
-            <Row>
-              <Col md={6}>
-                <FormField
-                  label="Mã sản phẩm (SKU)"
-                  required
-                  error={errors.sku}
-                >
-                  <Form.Control
-                    type="text"
-                    placeholder="VD: SKU-12345"
-                    value={formData.sku}
-                    onChange={(e) => handleChange('sku', e.target.value.toUpperCase())}
-                    isInvalid={!!errors.sku}
-                    disabled={isLoading}
-                  />
-                </FormField>
-              </Col>
-              <Col md={6}>
-                <FormField
-                  label="Danh mục"
-                  error={errors.categoryId as string}
-                >
-                  <Form.Select
-                    value={formData.categoryId || ''}
-                    onChange={(e) =>
-                      handleChange(
-                        'categoryId',
-                        e.target.value ? Number(e.target.value) : null
-                      )
-                    }
-                    isInvalid={!!errors.categoryId}
-                    disabled={isLoading}
-                  >
-                    <option value="">Chọn danh mục</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </FormField>
-              </Col>
-            </Row>
-
-            {/* Description */}
-            <FormField label="Mô tả sản phẩm">
-              <Form.Control
-                as="textarea"
-                rows={4}
-                placeholder="Nhập mô tả ngắn gọn về sản phẩm..."
-                value={formData.description}
-                onChange={(e) => handleChange('description', e.target.value)}
-                disabled={isLoading}
-                style={{ resize: 'none' }}
-              />
-            </FormField>
-
-            {/* Action Buttons */}
-            <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-              {onCancel && (
-                <Button
-                  variant="outline-secondary"
-                  onClick={onCancel}
+            {/* Thông tin cơ bản */}
+            <div className="mb-4">
+              <h5 className="fw-semibold mb-3 pb-2 border-bottom">Thông tin cơ bản</h5>
+              
+              {/* Tên sản phẩm */}
+              <FormField label="Tên sản phẩm" required error={errors.name}>
+                <Form.Control
+                  type="text"
+                  placeholder="Ví dụ: Sữa tươi TH True Milk 1L"
+                  value={formData.name}
+                  onChange={(e) => handleChange('name', e.target.value)}
+                  isInvalid={!!errors.name}
                   disabled={isLoading}
-                >
-                  Hủy
+                />
+              </FormField>
+
+              {/* SKU và Danh mục */}
+              <Row>
+                <Col md={6}>
+                  <FormField label="Mã sản phẩm (SKU)" required error={errors.sku}>
+                    <Form.Control
+                      type="text"
+                      placeholder="Ví dụ: SKU-12345"
+                      value={formData.sku}
+                      onChange={(e) => handleChange('sku', e.target.value.toUpperCase())}
+                      isInvalid={!!errors.sku}
+                      disabled={isLoading}
+                    />
+                  </FormField>
+                </Col>
+                <Col md={6}>
+                  {/* Select Danh mục đã được cập nhật logic hiển thị */}
+                  <FormField label="Danh mục" required error={errors.categoryId as string}>
+                    <Form.Select
+                      value={formData.categoryId || ''}
+                      onChange={(e) => handleChange('categoryId', e.target.value ? Number(e.target.value) : null)}
+                      isInvalid={!!errors.categoryId}
+                      disabled={isLoading}
+                    >
+                      <option value="">Chọn danh mục</option>
+                      {activeCategories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </FormField>
+                </Col>
+              </Row>
+
+              {/* Mô tả */}
+              <FormField label="Mô tả">
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  placeholder="Nhập mô tả ngắn gọn về sản phẩm..."
+                  value={formData.description}
+                  onChange={(e) => handleChange('description', e.target.value)}
+                  disabled={isLoading}
+                  style={{ resize: 'none' }}
+                />
+              </FormField>
+            </div>
+
+            {/* Giá và Kho hàng */}
+            <div className="mb-4">
+              <h5 className="fw-semibold mb-3 pb-2 border-bottom">Giá và Kho hàng</h5>
+              
+              <Row>
+                <Col md={6}>
+                  <FormField label="Giá bán (VNĐ)" required error={errors.price}>
+                    <Form.Control
+                      type="number"
+                      placeholder="0"
+                      value={formData.price}
+                      onChange={(e) => handleChange('price', Number(e.target.value))}
+                      isInvalid={!!errors.price}
+                      disabled={isLoading}
+                      min="0"
+                      step="1000"
+                    />
+                  </FormField>
+                </Col>
+                <Col md={6}>
+                  <FormField label="Đơn vị tính" required error={errors.unit}>
+                    <Form.Control
+                      type="text"
+                      placeholder="Ví dụ: Chai, Hộp, Kg..."
+                      value={formData.unit}
+                      onChange={(e) => handleChange('unit', e.target.value)}
+                      isInvalid={!!errors.unit}
+                      disabled={isLoading}
+                    />
+                  </FormField>
+                </Col>
+              </Row>
+
+              <Row>
+                <Col md={6}>
+                  <FormField label="Số lượng" required error={errors.quantity}>
+                    <Form.Control
+                      type="number"
+                      placeholder="0"
+                      value={formData.quantity}
+                      onChange={(e) => handleChange('quantity', Number(e.target.value))}
+                      isInvalid={!!errors.quantity}
+                      disabled={isLoading}
+                      min="0"
+                    />
+                  </FormField>
+                </Col>
+                <Col md={6}>
+                  <FormField label="Tồn kho" required error={errors.stock}>
+                    <Form.Control
+                      type="number"
+                      placeholder="0"
+                      value={formData.stock}
+                      onChange={(e) => handleChange('stock', Number(e.target.value))}
+                      isInvalid={!!errors.stock}
+                      disabled={isLoading}
+                      min="0"
+                    />
+                  </FormField>
+                </Col>
+              </Row>
+            </div>
+
+            {/* Trạng thái hoạt động */}
+            <div className="mb-4">
+              <h5 className="fw-semibold mb-3 pb-2 border-bottom">Cài đặt</h5>
+              
+              <Form.Group className="mb-4">
+                <Form.Label className="fw-bold">Trạng thái hoạt động</Form.Label>
+                <div className="d-flex gap-4 mt-2">
+                  <Form.Check
+                    type="radio"
+                    id="product-status-active"
+                    label="Hoạt động"
+                    name="productStatus"
+                    checked={formData.isActive === true}
+                    onChange={() => handleChange('isActive', true)}
+                    disabled={isLoading}
+                    className="fw-medium"
+                  />
+                  <Form.Check
+                    type="radio"
+                    id="product-status-inactive"
+                    label="Ngừng hoạt động"
+                    name="productStatus"
+                    checked={formData.isActive === false}
+                    onChange={() => handleChange('isActive', false)}
+                    disabled={isLoading}
+                    className="fw-medium"
+                  />
+                </div>
+              </Form.Group>
+            </div>
+
+            {/* Buttons */}
+            <div className="d-flex justify-content-end gap-2 pt-3 border-top">
+              {onCancel && (
+                <Button variant="light" onClick={onCancel} disabled={isLoading}>
+                  Hủy bỏ
                 </Button>
               )}
-              <Button
-                variant="primary"
-                type="submit"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Đang lưu...' : mode === 'create' ? 'Tạo sản phẩm' : 'Cập nhật'}
+              <Button variant="primary" type="submit" disabled={isLoading}>
+                {isLoading ? 'Đang lưu...' : mode === 'create' ? 'Tạo sản phẩm' : 'Lưu thay đổi'}
               </Button>
             </div>
           </Form>
@@ -241,60 +326,3 @@ const ProductForm: React.FC<ProductFormProps> = ({
 };
 
 export default ProductForm;
-
-// ============= USAGE EXAMPLES =============
-
-/*
-// Example 1: Create new product
-import ProductForm from './ProductForm';
-
-const CreateProductPage = () => {
-  const categories = [
-    { id: 1, name: 'Sữa & Đồ uống' },
-    { id: 2, name: 'Thực phẩm tươi sống' },
-  ];
-
-  const handleSubmit = (data: ProductFormData) => {
-    console.log('Creating product:', data);
-    // Call API here
-  };
-
-  return (
-    <ProductForm
-      categories={categories}
-      onSubmit={handleSubmit}
-      onCancel={() => window.history.back()}
-    />
-  );
-};
-
-// Example 2: Edit existing product
-const EditProductPage = () => {
-  const existingProduct = {
-    name: 'Sữa TH True Milk',
-    sku: 'SKU-001',
-    categoryId: 1,
-    description: 'Sữa tươi thanh trùng',
-  };
-
-  const categories = [
-    { id: 1, name: 'Sữa & Đồ uống' },
-    { id: 2, name: 'Thực phẩm tươi sống' },
-  ];
-
-  const handleSubmit = (data: ProductFormData) => {
-    console.log('Updating product:', data);
-    // Call API here
-  };
-
-  return (
-    <ProductForm
-      mode="edit"
-      initialData={existingProduct}
-      categories={categories}
-      onSubmit={handleSubmit}
-      isLoading={false}
-    />
-  );
-};
-*/

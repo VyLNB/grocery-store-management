@@ -35,6 +35,19 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.success(categories, "Get all categories successfully"));
     }
 
+    @GetMapping("/{id}") //lấy theo id
+    public ResponseEntity<ApiResponse<Category>> getCategoryById(@PathVariable Long id){
+        Category category = categoryService.getCategoryById(id);
+
+        if (category == null){
+            return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
+                        .body(ApiResponse.error("Category not found"));
+        }
+
+        return ResponseEntity.ok(ApiResponse.success(category, "Get category by id successfully"));
+    }
+
     @PutMapping("/{id}") //Cập nhập
     public ResponseEntity<ApiResponse<Category>> updateCategory(
         @PathVariable Long id,

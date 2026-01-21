@@ -10,40 +10,51 @@ import java.util.*;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    public CategoryService(CategoryRepository categoryRepository){
+    public CategoryService(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<Category> getAllCategories(){
+    public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }
 
-    public Category getCategoryById(Long id){
+    public Category getCategoryById(Long id) {
         return categoryRepository.findById(id).orElse(null);
     }
 
-    public Category createCategory(Category category){
+    public Category createCategory(Category category) {
         return categoryRepository.save(category);
     }
 
-    public boolean deleteCategoryById(Long id){
-        if (categoryRepository.existsById(id)){
+    public boolean deleteCategoryById(Long id) {
+        if (categoryRepository.existsById(id)) {
             categoryRepository.deleteById(id);
             return true;
         }
         return false;
     }
 
-    public Category updateCategoryById(Long id, Category newCategory){
+    public Category updateCategoryById(Long id, Category newCategory) {
         Category existingCategory = categoryRepository.findById(id).orElse(null);
 
-        if (existingCategory == null){
+        if (existingCategory == null) {
             return null;
         }
-        if (newCategory.getName() != null){
+
+        // Cập nhật name
+        if (newCategory.getName() != null) {
             existingCategory.setName(newCategory.getName());
         }
 
-        return categoryRepository.save(newCategory);
+        // Cập nhật description
+        if (newCategory.getDescription() != null) {
+            existingCategory.setDescription(newCategory.getDescription());
+        }
+
+        if (newCategory.getIsActive() != null){
+            existingCategory.setIsActive(newCategory.getIsActive());
+        }
+
+        return categoryRepository.save(existingCategory);
     }
 }

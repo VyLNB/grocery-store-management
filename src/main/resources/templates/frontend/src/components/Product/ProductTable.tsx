@@ -36,7 +36,6 @@ const ProductTable = () => {
             } else {
                 setProducts([]);
             }
-            // --------------------------
 
         } catch (error) {
             console.error('Error fetching products:', error);

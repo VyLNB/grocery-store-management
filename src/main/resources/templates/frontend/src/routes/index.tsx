@@ -5,8 +5,10 @@ import RegisterPage from "../pages/RegisterPage";
 import DashBoard from "../pages/DashBoard";
 import ProductPage from "../pages/Product/ProductPage";
 import AdminLayout from "../layout/AdminLayout";
-import CategoryPage from "../pages/Category";
+import CategoryPage from "../pages/Category/Category";
 import CreateProduct from "../pages/Product/CreateProduct";
+import CreatCategory from "../pages/Category/CreateCategory";
+import EditCategory from "../pages/Category/EditCategory";
 
 const router = createBrowserRouter([
     {
@@ -44,6 +46,14 @@ const router = createBrowserRouter([
                     {
                         index: true,
                         element: <CategoryPage />,
+                    },
+                    {
+                        path: 'add',
+                        element: <CreatCategory/>,
+                    }, 
+                    {
+                        path: 'edit/:id',
+                        element: <EditCategory/>
                     }
                 ],
             },

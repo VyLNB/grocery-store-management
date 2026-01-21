@@ -1,4 +1,4 @@
-import CategoryTable from "../components/Category/CategoryTable";
+import CategoryTable from "../../components/Category/CategoryTable";
 
 const CategoryPage = () => {
     return (

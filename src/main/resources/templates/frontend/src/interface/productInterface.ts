@@ -1,6 +1,6 @@
 // 1. Tạo thêm Interface cho Category
 export interface CategoryItem {
-    id: number;
+    id?: number;
     name: string;
     description: string;
     isActive: boolean;
