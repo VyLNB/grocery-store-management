@@ -18,7 +18,7 @@ public class Product {
     @JoinColumn(name = "category_id")
     private Category category;
     private String unit; // đơn vị tính: kg, cái, gói...
-    private Integer quantity;
+    private Integer quantity; 
     private Double price;
     private Integer stock; //số lượng tồn kho
     private Boolean status;
