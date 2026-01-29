@@ -13,7 +13,6 @@ const EditCategory = () => {
     const [fetching, setFetching] = useState(true); 
     const [categoryData, setCategoryData] = useState<CategoryItem | undefined>(undefined);
 
-    // 1. Lấy dữ liệu danh mục cũ
     useEffect(() => {
         const fetchData = async () => {
             if (!id) return;
@@ -21,15 +20,9 @@ const EditCategory = () => {
                 setFetching(true);
                 const response: any = await getCategoryById(Number(id));
                 
-                // --- DEBUG: In log để kiểm tra cấu trúc API trả về ---
-                console.log("API Chi tiết danh mục trả về:", response);
-
-                // --- XỬ LÝ LINH HOẠT ---
                 if (response && response.data) {
-                    // Trường hợp chuẩn: { success: true, data: { ... } }
                     setCategoryData(response.data);
                 } else if (response && response.id) {
-                    // Trường hợp API trả về thẳng object: { id: 1, name: ... }
                     setCategoryData(response);
                 } else {
                     console.error("Không tìm thấy dữ liệu trong response");
@@ -47,7 +40,6 @@ const EditCategory = () => {
         fetchData();
     }, [id, navigate]);
 
-    // 2. Xử lý lưu
     const handleSubmit = async (data: CategoryItem) => {
         if (!id) return;
 
@@ -80,16 +72,13 @@ const EditCategory = () => {
         );
     }
 
-    // Nếu không có dữ liệu sau khi fetch xong
     if (!categoryData) {
         return <div className="text-center py-5">Không tìm thấy dữ liệu danh mục.</div>;
     }
 
     return (
         <CategoryForm
-            // Truyền dữ liệu vào form
             initialData={categoryData} 
-            // Thêm key để React reset form khi ID thay đổi (quan trọng)
             key={categoryData.id} 
             onSubmit={handleSubmit}
             onCancel={handleCancel}

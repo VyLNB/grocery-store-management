@@ -1,11 +1,9 @@
-// CategoryForm.tsx
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Card } from 'react-bootstrap';
 import type { CategoryItem } from '../../interface/productInterface';
 
 interface CategoryFormProps {
   initialData?: CategoryItem;
-  // Xóa prop 'categories' vì form tạo danh mục không cần list danh mục khác
   onSubmit: (data: CategoryItem) => void;
   onCancel?: () => void;
   isLoading?: boolean;

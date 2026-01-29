@@ -45,18 +45,15 @@ export async function signin(
     credentials
   );
   
-  // DEBUG: Xem kết quả thực tế nhận được
   console.log("Login Response Data:", response);
 
-  // --- SỬA LẠI LOGIC LƯU TOKEN ---
-  // API trả về 'accessToken', không phải 'token'
   if (response && response.accessToken) {
     localStorage.setItem("token", response.accessToken);
     console.log("Đã lưu token vào LocalStorage:", response.accessToken);
   } else {
     console.error("Không tìm thấy accessToken trong phản hồi!");
   }
-  // -------------------------------
+
   
   return response;
 }

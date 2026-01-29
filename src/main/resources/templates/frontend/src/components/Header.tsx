@@ -1,5 +1,4 @@
-import { Form, InputGroup } from 'react-bootstrap';
-import { Search, Bell, HelpCircle } from 'lucide-react';
+import { Bell, HelpCircle } from 'lucide-react';
 
 const Header = () => {
   return (

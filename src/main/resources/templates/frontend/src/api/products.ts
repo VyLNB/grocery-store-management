@@ -19,6 +19,7 @@ export async function getAllProducts(): Promise<ProductResponse> {
     return await apiRequest<ProductResponse>('get', `/products`);
 }
 
+
 export async function createProduct(product: Omit<ProductItem, 'id'>): Promise<ProductSingleResponse> {
     return await apiRequest<ProductSingleResponse>('post', `/products`, product);
 }
@@ -26,3 +27,12 @@ export async function createProduct(product: Omit<ProductItem, 'id'>): Promise<P
 export async function getProductById(id: number): Promise<ProductSingleResponse>{
     return await apiRequest<ProductSingleResponse>('get', `/products/${id}`);
 }
+
+export async function updateProduct(id: number, product: Omit<ProductItem, 'id'>): Promise<ProductSingleResponse> {
+    return await apiRequest<ProductSingleResponse>('put', `/products/${id}`, product);
+}
+
+export async function deleteProduct(id: number): Promise<any> {
+    return await apiRequest('delete', `/products/${id}`);
+}
+

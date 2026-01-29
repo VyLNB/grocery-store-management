@@ -17,7 +17,6 @@ const CreatCategory = () => {
       
       console.log('Dữ liệu thực tế gửi đi (Không có ID):', payload);
 
-      // Ví dụ gọi API:
       await createCategory(payload);
 
       alert('Tạo danh mục thành công!');

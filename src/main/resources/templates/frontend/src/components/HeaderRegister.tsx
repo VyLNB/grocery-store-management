@@ -1,16 +1,14 @@
 import { FaStore } from 'react-icons/fa';
-import { Navbar, Container, Nav, Button } from 'react-bootstrap';
+import { Navbar, Container, Nav} from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 
 const HeaderRegister = () => {
-    // Màu tím chủ đạo lấy từ ảnh của bạn
     const brandColor = '#A855F7';
     const navigate = useNavigate();
 
     return (
         <Navbar bg="white" expand="lg" className="py-3 shadow-sm">
             <Container>
-                {/* === PHẦN LOGO === */}
                 <Navbar.Brand href="#home" className="d-flex align-items-center gap-2">
                     {/* Box icon màu tím */}
                     <div

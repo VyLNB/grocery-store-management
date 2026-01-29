@@ -9,6 +9,8 @@ import CategoryPage from "../pages/Category/Category";
 import CreateProduct from "../pages/Product/CreateProduct";
 import CreatCategory from "../pages/Category/CreateCategory";
 import EditCategory from "../pages/Category/EditCategory";
+import EditProduct from "../pages/Product/EditProduct";
+import POS from "../pages/POS";
 
 const router = createBrowserRouter([
     {
@@ -28,6 +30,10 @@ const router = createBrowserRouter([
                 element: <DashBoard />
             },
             {
+                path: "pos",
+                element: <POS />
+            },
+            {
                 path: "products",
                 children: [
                     {
@@ -37,6 +43,10 @@ const router = createBrowserRouter([
                     {
                         path: "add",
                         element: <CreateProduct/>,
+                    }, 
+                    {
+                        path: "edit/:id",
+                        element: <EditProduct/>
                     }
                 ],
             },

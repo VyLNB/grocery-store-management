@@ -11,7 +11,7 @@ import {
     ArrowRepeat // Icon nút reload
 } from 'react-bootstrap-icons';
 import type { ProductItem } from '../../interface/productInterface';
-import { getAllProducts } from '../../api/products';
+import { getAllProducts, deleteProduct } from '../../api/products';
 import { useNavigate } from 'react-router-dom';
 
 const ProductTable = () => {
@@ -70,6 +70,27 @@ const ProductTable = () => {
         return map[category] || 'bg-secondary-subtle text-secondary';
     };
 
+    const handleDelete = async (id: number) => {
+        // Hỏi xác nhận trước khi xóa
+        if (!window.confirm('Bạn có chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác.')) {
+            return;
+        }
+
+        try {
+            // Gọi API xóa
+            await deleteProduct(id);
+
+            // Cập nhật giao diện: Lọc bỏ item vừa xóa khỏi danh sách hiện tại mà không cần gọi lại API
+            setProducts((prevProducts) => prevProducts.filter((item) => item.id !== id));
+
+            alert('Đã xóa danh mục thành công!');
+        } catch (error: any) {
+            console.error('Lỗi khi xóa:', error);
+            // Hiển thị thông báo lỗi từ Backend nếu có
+            alert(error.response?.data?.message || 'Có lỗi xảy ra khi xóa danh mục.');
+        }
+    };
+
     const TableSkeleton = () => (
         <>
             {[...Array(5)].map((_, index) => (
@@ -116,7 +137,6 @@ const ProductTable = () => {
                             <input type="text" className="form-control border-start-0 ps-0" placeholder="Tìm kiếm..." />
                         </div>
                     </div>
-                    {/* ... (Giữ nguyên phần filter dropdown) ... */}
                     <div className="col-md-8 d-flex gap-3 justify-content-md-end flex-wrap">
                         <div className="dropdown">
                             <button className="btn btn-light dropdown-toggle d-flex align-items-center gap-2" type="button"><Filter /> Tất cả Danh mục</button>
@@ -197,8 +217,27 @@ const ProductTable = () => {
                                                         </div>
                                                     </td>
                                                     <td className="text-end pe-4">
-                                                        <button className="btn btn-link text-muted p-1 hover-purple"><PencilSquare size={18} /></button>
-                                                        <button className="btn btn-link text-muted p-1 hover-danger"><Trash size={18} /></button>
+                                                        <div className="d-flex justify-content-end gap-2">
+                                                            {/* Nút Sửa */}
+                                                            <button
+                                                                className="btn btn-light text-primary btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                                                style={{ width: '32px', height: '32px' }}
+                                                                title="Chỉnh sửa"
+                                                                onClick={() => navigate(`/admin/products/edit/${item.id}`)} // Thêm hàm xử lý sau
+                                                            >
+                                                                <PencilSquare size={16} />
+                                                            </button>
+
+                                                            {/* Nút Xóa */}
+                                                            <button
+                                                                className="btn btn-light text-danger btn-sm rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                                                                style={{ width: '32px', height: '32px' }}
+                                                                title="Xóa"
+                                                                onClick={() => item.id !== undefined && handleDelete(item.id)} // Thêm hàm xử lý sau
+                                                            >
+                                                                <Trash size={16} />
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             );

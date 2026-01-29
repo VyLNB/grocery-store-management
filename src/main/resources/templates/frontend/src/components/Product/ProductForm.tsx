@@ -62,7 +62,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     stock: 0,
     unit: '',
     description: '',
-    status: true, // Mặc định là Hoạt động
+    status: true, 
   };
 
   const [formData, setFormData] = useState<ProductFormData>(defaultData);
@@ -71,7 +71,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
   // Xử lý mapping dữ liệu khi mode là Edit
   useEffect(() => {
     if (initialData) {
-      // Kiểm tra xem initialData có phải là ProductItem (có chứa object category) không
       const categoryId = 'category' in initialData && initialData.category 
         ? initialData.category.id 
         : (initialData as ProductFormData).categoryId;
@@ -79,12 +78,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setFormData({
         id: initialData.id,
         name: initialData.name,
-        categoryId: categoryId || null, // Lấy ID từ object category
+        categoryId: categoryId || null, 
         price: initialData.price,
         quantity: initialData.quantity,
         stock: initialData.stock,
         unit: initialData.unit,
-        description: (initialData as any).description || '', // ProductItem trong interface chưa có desc, handle an toàn
+        description: (initialData as any).description || '', 
         status: initialData.status,
       });
     }

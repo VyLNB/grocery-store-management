@@ -1,6 +1,3 @@
-
-
-// Auth User - Khớp với response từ backend
 export interface AuthUser {
   id: string;
   email: string;

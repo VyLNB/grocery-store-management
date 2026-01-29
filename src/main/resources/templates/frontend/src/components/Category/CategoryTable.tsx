@@ -48,7 +48,6 @@ const CategoryTable = () => {
     }, []);
 
     const handleDelete = async (id: number) => {
-        // Hỏi xác nhận trước khi xóa
         if (!window.confirm('Bạn có chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác.')) {
             return;
         }
@@ -57,8 +56,7 @@ const CategoryTable = () => {
             // Gọi API xóa
             await deleteCategory(id);
 
-            // Cập nhật giao diện: Lọc bỏ item vừa xóa khỏi danh sách hiện tại
-            // Cách này giúp giao diện cập nhật ngay lập tức mà không cần load lại trang
+            // Cập nhật giao diện: Lọc bỏ item vừa xóa khỏi danh sách hiện tại mà không cần gọi lại API
             setProducts((prevProducts) => prevProducts.filter((item) => item.id !== id));
 
             alert('Đã xóa danh mục thành công!');
@@ -69,7 +67,6 @@ const CategoryTable = () => {
         }
     };
 
-    // --- 1. HÀM RENDER TRẠNG THÁI (MỚI) ---
     const renderStatus = (isActive: boolean) => {
         if (isActive) {
             return (
@@ -191,12 +188,12 @@ const CategoryTable = () => {
                                                     </div>
                                                 </td>
 
-                                                {/* Cột 2: Trạng thái (Đã thêm mới) */}
+                                                {/* Cột 2: Trạng thái */}
                                                 <td className="py-3">
                                                     {renderStatus(item.isActive)}
                                                 </td>
 
-                                                {/* Cột 3: Thao tác (Đã làm đẹp) */}
+                                                {/* Cột 3: Thao tác */}
                                                 <td className="text-end pe-4">
                                                     <div className="d-flex justify-content-end gap-2">
                                                         {/* Nút Sửa */}

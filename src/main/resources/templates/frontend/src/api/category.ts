@@ -1,7 +1,6 @@
 import type { CategoryItem } from "../interface/productInterface";
 import { apiRequest } from "./axios";
 
-// Interface cho phản hồi danh sách (GET ALL)
 export interface CategoryResponse {
     success: boolean;
     data: CategoryItem[];
@@ -9,8 +8,6 @@ export interface CategoryResponse {
     timestamp: Date;
 }
 
-// Interface cho phản hồi một đối tượng (CREATE / UPDATE / GET BY ID)
-// Backend thường trả về chính đối tượng vừa tạo kèm ID mới sinh ra
 export interface CategorySingleResponse {
     success: boolean;
     data: CategoryItem; 
@@ -23,7 +20,6 @@ export async function getAllCategories(): Promise<CategoryResponse> {
 }
 
 /**
- * Hàm tạo danh mục mới
  * Sử dụng Omit<CategoryItem, 'id'> để loại bỏ trường id khỏi dữ liệu gửi đi
  */
 export async function createCategory(category: Omit<CategoryItem, 'id'>): Promise<CategorySingleResponse> {
