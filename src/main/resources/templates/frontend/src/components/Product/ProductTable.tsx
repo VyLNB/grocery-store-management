@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
     Search,
     Filter,
@@ -10,46 +9,14 @@ import {
     ExclamationTriangleFill, // Icon cho lỗi
     ArrowRepeat // Icon nút reload
 } from 'react-bootstrap-icons';
-import type { ProductItem } from '../../interface/productInterface';
-import { getAllProducts, deleteProduct } from '../../api/products';
+import { deleteProduct } from '../../api/products';
 import { useNavigate } from 'react-router-dom';
+import { useProducts } from '../../hooks/useProduct';
 
 const ProductTable = () => {
-    const [products, setProducts] = useState<ProductItem[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const {products, loading, error, setProducts, refetch} = useProducts();
 
     const navigate = useNavigate();
-
-    const fetchProducts = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-
-            // Gọi API
-            const result = await getAllProducts();
-
-            if (Array.isArray(result)) {
-                setProducts(result);
-            } else if (result && typeof result === 'object' && Array.isArray((result as any).data)) {
-                setProducts((result as any).data);
-            } else {
-                setProducts([]);
-            }
-
-        } catch (error) {
-            console.error('Error fetching products:', error);
-            setError(error instanceof Error ? error.message : 'Không thể kết nối đến máy chủ');
-            setProducts([]);
-        } finally {
-            ;
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchProducts();
-    }, []);
 
     // Helper format
     const formatPrice = (price: number) => new Intl.NumberFormat('vi-VN').format(price) + 'đ';
@@ -160,7 +127,7 @@ const ProductTable = () => {
                         <p className="text-muted mb-4 text-center" style={{ maxWidth: '400px' }}>
                             {error}. Vui lòng kiểm tra kết nối mạng hoặc phiên đăng nhập.
                         </p>
-                        <button className="btn btn-outline-danger d-flex align-items-center gap-2" onClick={fetchProducts}>
+                        <button className="btn btn-outline-danger d-flex align-items-center gap-2" onClick={refetch}>
                             <ArrowRepeat size={18} /> Thử lại
                         </button>
                     </div>

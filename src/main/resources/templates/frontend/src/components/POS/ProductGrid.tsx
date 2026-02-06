@@ -1,38 +1,84 @@
-import { Container, Row, Col } from 'react-bootstrap';
-import ProductCard from './ProductCard'; // Đường dẫn import
+import React from 'react';
+import { Container, Row, Col, Button } from 'react-bootstrap';
+import ProductCard from './ProductCard';
+import { useProducts } from '../../hooks/useProduct';
 
-const ProductGrid = () => {
-  // Dữ liệu giả lập giống trong hình
-  const products = [
-    { id: 1, category: "Đồ uống", name: "Sữa tươi TH True Milk 1L", price: 32000, stock: 124 },
-    { id: 2, category: "Thực phẩm khô", name: "Mì Hảo Hảo Tôm Chua Cay", price: 4500, stock: 15 },
-    { id: 3, category: "Hóa mỹ phẩm", name: "Nước giặt OMO Matic 2kg", price: 185000, stock: 0 }, // Test hết hàng
-    { id: 4, category: "Đồ uống", name: "Nước khoáng Lavie 500ml", price: 6000, stock: 450 },
-    { id: 5, category: "Bánh kẹo", name: "Bánh quy Cosy 250g", price: 25000, stock: 80 },
+interface ProductGridProps {
+  onAddToCart: (product: any) => void;
+}
+
+const ProductGrid: React.FC<ProductGridProps> = ({ onAddToCart }) => {
+  const { products } = useProducts();
+
+  const categories = [
+    "Tất cả",
+    "Đồ uống",
+    "Thực phẩm khô",
+    "Hóa mỹ phẩm",
+    "Bánh kẹo",
+    "Gia vị"
   ];
 
   return (
-    <Container className="py-5 bg-light" fluid>
-      <h3 className="mb-4">Danh sách sản phẩm</h3>
-      
-      {/* Grid system của Bootstrap */}
-      <Row className="g-3"> {/* g-3 tạo khoảng cách giữa các card */}
-        {products.map((product) => (
-          // xs={12}: Mobile 1 cột
-          // sm={6}: Tablet nhỏ 2 cột
-          // md={4}: Tablet 3 cột
-          // lg={3}: Desktop 4 cột (Giống hình)
-          <Col key={product.id} xs={12} sm={6} md={4} lg={3}>
-            <ProductCard
-              category={product.category}
-              name={product.name}
-              price={product.price}
-              stock={product.stock}
-              onClick={() => console.log("Clicked:", product.name)}
-            />
-          </Col>
-        ))}
-      </Row>
+    <Container fluid className="h-100 d-flex flex-column">
+
+      {/* Header */}
+      <div className="bg-white p-3 rounded-4 mb-3 shadow-sm">
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <h4 className="m-0 fw-bold">Bán hàng tại quầy</h4>
+          <span className="text-muted small">24 Tháng 5, 2024</span>
+        </div>
+
+        {/* Search */}
+        {/* <InputGroup className="mb-3">
+          <InputGroup.Text className="bg-light border-0">
+            <Search />
+          </InputGroup.Text>
+          <Form.Control
+            placeholder="Quét mã vạch hoặc tìm theo tên sản phẩm..."
+            className="bg-light border-0 shadow-none"
+          />
+        </InputGroup> */}
+
+        {/* Category filter */}
+        <div
+          className="d-flex gap-2 overflow-auto pb-2"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          {categories.map((cat, idx) => (
+            <Button
+              key={idx}
+              variant={idx === 0 ? 'primary' : 'light'}
+              className={`rounded-pill px-3 fw-bold border-0 ${
+                idx === 0
+                  ? 'bg-primary text-white'
+                  : 'bg-white text-dark shadow-sm'
+              }`}
+              style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}
+            >
+              {cat}
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Product grid */}
+      <div className="flex-grow-1 overflow-auto pe-1">
+        <Row className="g-3">
+          {products.map((product: any) => (
+            <Col key={product.id} xs={12} sm={6} md={4} lg={3} xl={3}>
+              <ProductCard
+                category={product.category?.name || 'Khác'}
+                name={product.name}
+                price={product.price}
+                stock={product.stock}
+                onDoubleClick={() => onAddToCart(product)}
+              />
+            </Col>
+          ))}
+        </Row>
+      </div>
+
     </Container>
   );
 };
