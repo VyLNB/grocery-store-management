@@ -62,7 +62,7 @@ const Login = () => {
                                     </InputGroup.Text>
                                     <Form.Control
                                         type="text"
-                                        placeholder="Email hoặc tên tài khoản"
+                                        placeholder="Tên đăng nhập"
                                         className="py-2"
                                         name="username"
                                         value={username}

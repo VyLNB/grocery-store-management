@@ -1,5 +1,4 @@
 import axios, { AxiosError } from "axios";
-import type { InternalAxiosRequestConfig } from "axios";
 
 export interface ApiResponse<T = unknown> {
     success: boolean;
@@ -15,18 +14,19 @@ const apiClient = axios.create({
     },
 });
 
-apiClient.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem("token");
-        if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+
+  if (
+    token &&
+    config.headers &&
+    !config.url?.startsWith("/auth/")
+  ) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
 
 export function setAuthToken(token: string) {
   apiClient.defaults.headers.common["Authorization"] = `Bearer ${token}`;

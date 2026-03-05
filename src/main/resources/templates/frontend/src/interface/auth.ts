@@ -1,14 +1,10 @@
 export interface AuthUser {
-  id: string;
+  id: number; 
   email: string;
-  name: string;
+  username: string; 
 }
 
-// Auth Response từ login/register
 export interface AuthResponse {
-  success: boolean;
-  message: string;
-  token: string;
-  user: AuthUser;
+  accessToken: string; 
+  userDetail: AuthUser; 
 }
-

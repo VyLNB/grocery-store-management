@@ -10,4 +10,8 @@ import lombok.Setter;
 @Setter
 public class JwtProperties {
     private String secret;
+
+    private long accessTokenExpiration = 15 * 60 * 1000L;
+
+    private long refreshTokenExpiration = 7 * 24 * 60 * 60 * 1000L;
 }

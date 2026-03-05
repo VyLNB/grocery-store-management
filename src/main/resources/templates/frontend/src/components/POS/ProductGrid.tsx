@@ -20,7 +20,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ onAddToCart }) => {
   ];
 
   return (
-    <Container fluid className="h-100 d-flex flex-column">
+    <Container fluid className="h-100 d-flex flex-column p-0">
 
       {/* Header */}
       <div className="bg-white p-3 rounded-4 mb-3 shadow-sm">
@@ -66,7 +66,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({ onAddToCart }) => {
       <div className="flex-grow-1 overflow-auto pe-1">
         <Row className="g-3">
           {products.map((product: any) => (
-            <Col key={product.id} xs={12} sm={6} md={4} lg={3} xl={3}>
+            <Col key={product.id} xs={12} sm={6} md={4} lg={4} xl={4}>
               <ProductCard
                 category={product.category?.name || 'Khác'}
                 name={product.name}

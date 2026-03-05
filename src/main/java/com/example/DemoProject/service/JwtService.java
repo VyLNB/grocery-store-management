@@ -13,7 +13,7 @@ import java.security.Key;
 import java.util.Date;
 
 @Service
-@RequiredArgsConstructor // Tự động tạo Constructor để inject JwtProperties
+@RequiredArgsConstructor
 public class JwtService {
 
     private final JwtProperties jwtProperties;
@@ -22,34 +22,21 @@ public class JwtService {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 15 * 60 * 1000))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public String generateRefreshToken(User user) {
-        return Jwts.builder()
-                .setSubject(user.getEmail())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000)) // 24 giờ
+                // Dùng cấu hình từ JwtProperties thay vì hardcode
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getAccessTokenExpiration()))
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
     private Key getKey() {
-        // 2. Lấy secret từ jwtProperties
         String secret = jwtProperties.getSecret();
-
-        // Kiểm tra an toàn để tránh NullPointerException
         if (secret == null || secret.isEmpty()) {
             throw new RuntimeException("JWT Secret Key chưa được cấu hình!");
         }
-
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // JwtService.java
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -61,10 +48,7 @@ public class JwtService {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getKey())
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(getKey()).build().parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;
