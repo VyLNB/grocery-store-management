@@ -3,6 +3,7 @@ import { Row, Col, Button} from 'react-bootstrap';
 import { Trash, Wallet2 } from 'react-bootstrap-icons';
 import ProductGrid from '../components/POS/ProductGrid';
 import CartItem from '../components/POS/cart/CartItem';
+import { createCheckout } from '../api/order';
 
 interface CartItemType {
     id: number;
@@ -14,6 +15,7 @@ interface CartItemType {
 
 const POS = () => {
     const [cart, setCart] = useState<CartItemType[]>([]);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const handleAddToCart = (product: any) => {
         setCart(prev => {
@@ -52,6 +54,35 @@ const POS = () => {
 
     const formatMoney = (n: number) => 
         new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(n).replace('₫', 'đ');
+
+    const handleCheckout = async() => {
+        if (cart.length === 0) {
+            alert("Giỏ hàng trống!");
+            return;
+        }
+
+        setIsProcessing(true);
+
+        try {
+            const payload = {
+                paymentMethod: "CASH",
+                items: cart.map(item => ({
+                    productId: item.id,
+                    quantity: item.quantity
+                }))
+            };
+
+            await createCheckout(payload);
+            
+            alert("Thanh toán thành công!");
+            clearCart();
+        } catch (error) {
+            console.error("Lỗi khi thanh toán:", error);
+            alert("Đã xảy ra lỗi trong quá trình thanh toán.");
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <div className="bg-light overflow-hidden" style={{ height: 'calc(100vh - 120px)' }}>
@@ -102,8 +133,14 @@ const POS = () => {
                             <span className="fw-bold fs-5 text-primary" style={{color: '#8b5cf6'}}>{formatMoney(total)}</span>
                         </div>
 
-                        <Button className="w-100 py-2 fw-bold text-uppercase shadow-sm" style={{backgroundColor: '#8b5cf6', borderColor: '#8b5cf6'}}>
-                            <Wallet2 className="me-2"/> Thanh toán (F9)
+                        <Button 
+                            className="w-100 py-2 fw-bold text-uppercase shadow-sm" 
+                            style={{backgroundColor: '#8b5cf6', borderColor: '#8b5cf6'}}
+                            onClick={handleCheckout}
+                            disabled={isProcessing || cart.length === 0}
+                        >
+                            <Wallet2 className="me-2"/> 
+                            {isProcessing ? "Đang xử lý..." : "Thanh toán (F9)"}
                         </Button>
                     </div>
 

@@ -17,14 +17,10 @@ const SignupPayloadSchema = z.object({
 export type SigninPayload = z.infer<typeof SigninPayloadSchema>;
 export type SignupPayload = z.infer<typeof SignupPayloadSchema>;
 
-// --- SỬA LẠI INTERFACE CHO KHỚP API ---
 export interface AuthResponse {
-  // Postman không trả về success/message ở tầng data đã unwrap,
-  // nhưng nếu axios unwrap rồi thì ta chỉ cần quan tâm bên trong data:
-  accessToken: string; // SỬA: token -> accessToken
+  accessToken: string; 
   user: AuthUser; 
 }
-// ----------------------------------------
 
 export interface UserProfileResponse {
   success: boolean;
