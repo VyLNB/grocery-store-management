@@ -1,6 +1,9 @@
 package com.example.DemoProject.model;
 
 import lombok.*;
+
+import java.util.List;
+
 import jakarta.persistence.*;
 
 
@@ -16,4 +19,7 @@ public class User {
     private String username;
     private String email;
     private String password;
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders;
 }
